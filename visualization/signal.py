@@ -77,7 +77,7 @@ def show_signal(name,
     frame = signal_to_frame(signal, width, height, frame, draw_type, thickness, foreground, background, scale,
                             ret_scale, padding)
     if fps_info is not None:
-        fps = fps_info[1] if fps_info else 0
+        fps = fps_info[0] if fps_info else 0
         text = "%d fps" if len(fps_info) < 2 else fps_info[1]
         color = (0, 0, 255) if len(fps_info) < 3 else fps_info[2]
         draw_fps(frame, fps, text, color)
