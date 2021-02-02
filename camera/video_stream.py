@@ -85,7 +85,7 @@ class VideoStream:
 
     def get_fps(self):
         if len(self.time_stamp) > 1:
-            perf_time = self.time_stamp[-1] - self.time_stamp[0]
+            perf_time = (self.time_stamp[-1] - self.time_stamp[0]) / (len(self.time_stamp) - 1)
             return 1.0 / perf_time
         else:
             return 0
