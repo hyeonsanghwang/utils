@@ -36,5 +36,19 @@ def min_max_normalize(data, scale=None, axis=-1, ret_min_max=False):
         return restore
 
 
+def zero_centered_normalize(data, axis=-1):
+    np_data = np.array(data, np.float)
+    transposed, transposed_shape = target_axis_to_front(np_data, axis)
+    axis = 0
 
+    normed = transposed - transposed.mean(axis=axis)
+    data_max, data_min = normed.max(axis=axis), normed.min(axis=axis)
+    div = np.maximum(data_max, np.fabs(data_min))
+    if isinstance(div, np.ndarray):
+        div[div == 0] = 1
+    else:
+        div = 1 if div == 0 else div
+    normed = normed / div
 
+    restore = np.transpose(normed, transposed_shape)
+    return restore
