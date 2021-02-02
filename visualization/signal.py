@@ -76,6 +76,8 @@ def show_signal(name,
     cv2.imshow(name, frame)
 
 
+sin_signals = []
+sin_index = 0
 def show_sin_signals(name="BPMs",
                      fps=30,
                      duration=15,
