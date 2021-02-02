@@ -75,3 +75,43 @@ def show_signal(name,
 
     cv2.imshow(name, frame)
 
+
+def show_sin_signals(name="BPMs",
+                     fps=30,
+                     duration=15,
+                     window_size=None,
+                     bpms=(10, 15, 20, 25, 30, 35, 40),
+                     signal_width=500,
+                     signal_height=100,
+                     frame_margin=5):
+
+    window_size = fps * duration if window_size is None else window_size
+
+    # Create bpm frame
+    n_bpms = len(bpms)
+    bpm_frame = np.zeros((frame_margin * (n_bpms + 1) + signal_height * n_bpms, signal_width, 3), np.uint8)
+
+    # Draw sin signals
+    global sin_index, sin_signals
+    for i, bpm in enumerate(bpms):
+        # Set sin signals
+        sin_value = np.sin(sin_index * (2 * np.pi) / ((60.0 / bpm) * fps))
+        if sin_index == 0:
+            sin_signals.append([sin_value])
+        else:
+            sin_signals[i].append(sin_value)
+            if len(sin_signals[i]) > window_size:
+                del sin_signals[i][0]
+
+        # Draw signals
+        target_frame = bpm_frame[frame_margin * (i + 1) + signal_height * i: frame_margin * (i + 1) + signal_height * (i + 1),
+                       ...]
+        target_frame[...] = signal_to_frame(sin_signals[i], width=signal_width, height=signal_height, padding=0)
+        cv2.putText(target_frame, '%02d bpm' % bpm, (signal_width-70, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+
+    # increase sin index
+    sin_index += 1
+
+    # Show frame
+    cv2.imshow(name, bpm_frame)
+
