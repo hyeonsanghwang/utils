@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 import numpy as np
 import cv2
 from visualization.common import draw_fps
+from processing.normalize import min_max_normalize
 
 DRAW_TYPE_LINE = 0
 DRAW_TYPE_BAR = 1
@@ -31,17 +32,7 @@ def signal_to_frame(signal,
         height, width, _ = frame.shape
     padded_width, padded_height = width - padding * 2, height - padding * 2
 
-    data_min, data_max = np.min(data), np.max(data)
-    if scale is not None:
-        data_min, data_max = np.min(scale), np.max(scale)
-        data[data > data_max] = data_max
-        data[data < data_min] = data_min
-
-    term = data_max - data_min
-    if term == 0:
-        normed = np.zeros(data.shape, np.float)
-    else:
-        normed = (data - data_min) / term
+    normed, (data_min, data_max) = min_max_normalize(data, scale, axis=-1, ret_min_max=True)
 
     if draw_type == DRAW_TYPE_LINE:
         for i in range(length-1):

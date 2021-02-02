@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 import numpy as np
 from scipy.fftpack import rfft, rfftfreq, irfft
+from processing.common import target_axis_to_rear
 
 
 
@@ -31,25 +32,6 @@ def unpadding(padded_data, shape):
         slices.append(slice(0, i))
     slices = tuple(slices)
     return padded_data[slices]
-
-
-def target_axis_to_rear(data, axis):
-    if axis == -1:
-        transposed = data
-        transpose_shape = tuple(range(len(data.shape)))
-    else:
-        transpose_shape = []
-        last_index = len(data.shape)-1
-        for i, s in enumerate(data.shape):
-            if i == axis:
-                transpose_shape.append(last_index)
-                last_index = i
-            else:
-                transpose_shape.append(i)
-        transpose_shape[-1] = last_index
-        transpose_shape = tuple(transpose_shape)
-        transposed = np.transpose(data, transpose_shape)
-    return transposed, transpose_shape
 
 
 def get_fft(data, axis=-1, pad=1):
