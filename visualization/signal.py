@@ -24,6 +24,8 @@ def signal_to_frame(signal,
                     padding=2):
     data = np.array(signal, np.float)
     length = data.shape[0]
+    if length == 0:
+        data = np.array([0, 0, 0, 0, 0])
 
     if frame is None:
         width = (length + padding * 2) if width == -1 else width
