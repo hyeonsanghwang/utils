@@ -87,7 +87,12 @@ def show_sin_signals(name="BPMs",
                      bpms=(10, 15, 20, 25, 30, 35, 40),
                      signal_width=500,
                      signal_height=100,
-                     frame_margin=5):
+                     frame_margin=5,
+                     init_data=False):
+    global sin_signals, sin_index
+    if init_data:
+        sin_signals = []
+        sin_index = 0
 
     window_size = fps * duration if window_size is None else window_size
 
