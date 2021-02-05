@@ -101,7 +101,6 @@ def show_sin_signals(name="BPMs",
     bpm_frame = np.zeros((frame_margin * (n_bpms + 1) + signal_height * n_bpms, signal_width, 3), np.uint8)
 
     # Draw sin signals
-    global sin_index, sin_signals
     for i, bpm in enumerate(bpms):
         # Set sin signals
         sin_value = np.sin(sin_index * (2 * np.pi) / ((60.0 / bpm) * fps))
