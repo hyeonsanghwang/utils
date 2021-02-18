@@ -40,6 +40,7 @@ class VideoStream:
                 self.fps = 30 if self.fps is None else self.fps
             else:
                 self.status = self.FORMAT_VIDEO
+                self.stream = cv2.VideoCapture(self.src)
                 self.fps = self.get(cv2.CAP_PROP_FPS) if self.fps is None else self.fps
                 self.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
                 self.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
