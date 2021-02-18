@@ -21,15 +21,11 @@ def signal_to_frame(signal,
                     background=(0, 0, 0),
                     scale=None,
                     ret_scale=False,
-                    padding=2,
-                    flip=False):
+                    padding=2):
     data = np.array(signal, np.float)
     length = data.shape[0]
     if length == 0:
         data = np.array([0, 0, 0, 0, 0])
-
-    if flip:
-        data *= -1
 
     if frame is None:
         width = (length + padding * 2) if width == -1 else width
