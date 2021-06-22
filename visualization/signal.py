@@ -11,75 +11,114 @@ DRAW_TYPE_LINE = 0
 DRAW_TYPE_BAR = 1
 
 
-def signal_to_frame(signal,
-                    width=-1,
-                    height=100,
-                    frame=None,
-                    draw_type=DRAW_TYPE_LINE,
-                    thickness=3,
-                    foreground=(0, 0, 255),
-                    background=(0, 0, 0),
-                    scale=None,
-                    ret_scale=False,
-                    padding=2,
-                    flip=False):
-    data = np.array(signal, np.float)
-    length = data.shape[0]
-    if length == 0:
-        data = np.array([0, 0, 0, 0, 0])
+def signal_to_frame(signal,                     # Signal
+                    width=-1,                   # Frame info (width)
+                    height=100,                 # Frame info (height)
+                    frame=None,                 # Frame info (to draw)
+                    padding=2,                  # Frame info (padding)
+                    draw_type=DRAW_TYPE_LINE,   # Line info (line type)
+                    thickness=3,                # Line info (thickness)
+                    foreground=(0, 0, 255),     # Color info (foreground)
+                    background=(0, 0, 0),       # Color info (background)
+                    scale=None,                 # Scale info (target scale of value)
+                    ret_scale=False,            # Scale info (return scale)
+                    flip=False,                 # Flip
+                    circle_indexes=[],          # Circle info (indexes)
+                    circle_color=(0, 0, 255),   # Circle info (color)
+                    circle_radius=5):           # Circle info (radius)
 
-    if flip:
-        data *= -1
+    # Validate data
+    try:
+        data = np.array(signal, np.float)
+        data_len = data.shape[0]
+        if len(data.shape) > 1:
+            print("[ERROR] signal_to_frame: Signal must be one-dimensional.")
+            return (None, None) if ret_scale else None
+        if data_len < 2:
+            print("[ERROR] signal_to_frame: The length of signal must be 2 or more.")
+            return (None, None) if ret_scale else None
+    except:
+        print("[ERROR] signal_to_frame: Unknown data type (list or np.array).")
+        return (None, None) if ret_scale else None
 
+    # Set frame
     if frame is None:
-        width = (length + padding * 2) if width == -1 else width
+        width = (data_len + padding * 2) if width == -1 else width
         frame = np.ones((height, width, 3), np.uint8) * np.array(background, np.uint8)
     else:
         height, width, _ = frame.shape
-    padded_width, padded_height = width - padding * 2, height - padding * 2
+    pad_w, pad_h = width - padding * 2, height - padding * 2
 
+    # Normalize data
+    data = (data * -1) if flip else data
     normed, (data_min, data_max) = min_max_normalize(data, scale, axis=-1, ret_min_max=True)
 
+    # Draw data
     if draw_type == DRAW_TYPE_LINE:
-        for i in range(length-1):
-            sx = int(padding + (padded_width / length) * i)
-            sy = int(height - padding - (padded_height * normed[i]))
-            ex = int(padding + (padded_width / length) * (i + 1))
-            ey = int(height - padding - (padded_height * normed[i + 1]))
+        for i in range(data_len - 1):
+            sx = int(padding + (pad_w / data_len) * i)
+            sy = int(height - padding - (pad_h * normed[i]))
+            ex = int(padding + (pad_w / data_len) * (i + 1))
+            ey = int(height - padding - (pad_h * normed[i + 1]))
             cv2.line(frame, (sx, sy), (ex, ey), foreground, thickness)
+            if i in circle_indexes:
+                cv2.circle(frame, ((sx + ex) // 2, (sy + ey) // 2), circle_radius, circle_color, -1)
     elif draw_type == DRAW_TYPE_BAR:
-        for i in range(length):
-            sx = int(padding + (padded_width / length) * i)
-            sy = int(height - padding - (padded_height * normed[i]))
-            ex = int(padding + (padded_width / length) * (i + 1))
+        for i in range(data_len):
+            sx = int(padding + (pad_w / data_len) * i)
+            sy = int(height - padding - (pad_h * normed[i]))
+            ex = int(padding + (pad_w / data_len) * (i + 1))
             ey = int(height - 1)
             cv2.rectangle(frame, (sx, sy), (ex, ey), foreground, -1)
+
     return (frame, (data_min, data_max)) if ret_scale else frame
 
 
-def show_signal(name,
-                signal,
-                width=-1,
-                height=100,
-                frame=None,
-                draw_type=DRAW_TYPE_LINE,
-                thickness=3,
-                foreground=(0, 0, 255),
-                background=(0, 0, 0),
-                scale=None,
-                ret_scale=False,
-                padding=2,
-                fps_info=None):
+def show_signal(name,                       # Window name
+                signal,                     # Signal
+                width=-1,                   # Frame info (width)
+                height=100,                 # Frame info (height)
+                frame=None,                 # Frame info (to draw)
+                padding=2,                  # Frame info (padding)
+                draw_type=DRAW_TYPE_LINE,   # Line info (line type)
+                thickness=3,                # Line info (thickness)
+                foreground=(0, 0, 255),     # Color info (foreground)
+                background=(0, 0, 0),       # Color info (background)
+                scale=None,                 # Scale info (target scale of value)
+                ret_scale=False,            # Scale info (return scale)
+                flip=False,                 # Flip
+                circle_indexes=[],          # Circle info (indexes)
+                circle_color=(0, 0, 255),   # Circle info (color)
+                circle_radius=5,            # Circle info (radius)
+                fps_text=None,              # Fps info (string)
+                fps_color=(0, 255, 255),    # Fps info (color)
+                fps_location=(5, 20)):      # Fps info (location)
 
-    frame = signal_to_frame(signal, width, height, frame, draw_type, thickness, foreground, background, scale,
-                            ret_scale, padding)
+    ret = signal_to_frame(signal=signal,
+                          width=width,
+                          height=height,
+                          frame=frame,
+                          padding=padding,
+                          draw_type=draw_type,
+                          thickness=thickness,
+                          foreground=foreground,
+                          background=background,
+                          scale=scale,
+                          ret_scale=ret_scale,
+                          flip=flip,
+                          circle_indexes=circle_indexes,
+                          circle_color=circle_color,
+                          circle_radius=circle_radius)
+    if ret_scale:
+        frame, scale = ret
+    else:
+        frame = ret
+
     if fps_info is not None:
-        fps = fps_info[0] if fps_info else 0
-        text = "%d fps" if len(fps_info) < 2 else fps_info[1]
-        color = (0, 0, 255) if len(fps_info) < 3 else fps_info[2]
-        draw_fps(frame, fps, text, color)
+        frame = draw_fps(frame, fps_text, fps_color, fps_location)
 
     cv2.imshow(name, frame)
+    return (frame, scale) if ret_scale else frame
 
 
 sin_signals = []
