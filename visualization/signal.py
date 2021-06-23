@@ -114,7 +114,7 @@ def show_signal(name,                       # Window name
     else:
         frame = ret
 
-    if fps_info is not None:
+    if fps_text is not None:
         frame = draw_fps(frame, fps_text, fps_color, fps_location)
 
     cv2.imshow(name, frame)
