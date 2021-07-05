@@ -133,8 +133,9 @@ def show_sin_signals(name="BPMs",
                      frame_margin=5,
                      init_data=False):
     global sin_signals, sin_index
+
     if init_data:
-        sin_signals = []
+        sin_signals = [0]
         sin_index = 0
 
     window_size = fps * duration if window_size is None else window_size
@@ -148,7 +149,7 @@ def show_sin_signals(name="BPMs",
         # Set sin signals
         sin_value = np.sin(sin_index * (2 * np.pi) / ((60.0 / bpm) * fps))
         if sin_index == 0:
-            sin_signals.append([sin_value])
+            sin_signals.append([0, sin_value])
         else:
             sin_signals[i].append(sin_value)
             if len(sin_signals[i]) > window_size:
