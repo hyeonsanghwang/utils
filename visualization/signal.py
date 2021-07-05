@@ -135,7 +135,7 @@ def show_sin_signals(name="BPMs",
     global sin_signals, sin_index
 
     if init_data:
-        sin_signals = [0]
+        sin_signals = []
         sin_index = 0
 
     window_size = fps * duration if window_size is None else window_size
