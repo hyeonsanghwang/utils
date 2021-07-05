@@ -51,7 +51,8 @@ class VideoStream:
     def set(self, prop, value):
         if prop == cv2.CAP_PROP_FPS:
             self.fps = value
-
+            if self.status == self.FORMAT_WEBCAM and self.stream is not None:
+                self.stream.set(prop, value)
         if self.status == self.FORMAT_WEBCAM or self.status == self.FORMAT_VIDEO:
             if prop == cv2.CAP_PROP_FRAME_WIDTH:
                 self.width = value
